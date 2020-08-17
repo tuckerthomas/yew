@@ -91,7 +91,48 @@ Yew doesn't natively support pure or function components, but they are available
 Functional components are still in development! There's a 
 [project board](https://github.com/yewstack/yew/projects/3) detailing their status.
 
-## Keyed DOM nodes when they arrive
+## Keyed DOM nodes
+
+Keyed DOM nodes allow for optimizations when comparing items in a list. For example, if you are _inserting_, _removing_ or _reordering_ said items, using keyed nodes will help with computational time.
+
+Normally when items are compared, their different attributes are compared until the code finds something different. With keys, a unique value is applied to each item and only that value needs to be compared to see if the item is different. With this keyed nodes, this allows your code reduce the amount of time it will access the DOM.
+
+Below is an example of using keyed nodes and an expanded [example](https://github.com/yewstack/yew/tree/master/examples/keyed_list) in the yew examples folder.
+
+```rust
+use yew::ShouldRender;
+
+#[derive(PartialEq)]
+struct PersonProps {
+    id: usize,
+    name: Rc<String>,
+    address: Rc<String>,
+    age: usize,
+}
+
+struct Person {
+    props: PersonProps,
+};
+
+impl PersonProps {
+    fn render(&self) -> Html {
+        html! {
+            <div class="person">
+                <h1>{ &self.id }{ " - " }{ &self.name }</h1>
+                <p>{ "Age: " }{ &self.age }</p>
+                <p>{ "Address: " }{ &self.address }</p>
+            </div>
+        }
+    }
+}
+
+impl Person {
+    fn view(&self) -> Html {
+        html! { <PersonComponent info=self.props key=self.id.to_string() /> },
+    }
+}
+```
+
 
 ## Reducing compile time using workspaces
 
